@@ -556,7 +556,7 @@ const BookContainer = styled.div`
   }
 `;
 
-const FictionContent = () => {
+const FictionContent = ({activeGenre}) => {
   const [fictionImages, setFictionImages] = useState([]);
   const [selectedBook, setSelectedBook] = useState([]);
   const [hoveredBook, setHoveredBook] = useState(null);
@@ -579,9 +579,10 @@ const FictionContent = () => {
 
   const fetchFictionImages = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/images/Fiction", {
+      const response = await axios.get(`http://localhost:5000/images/${activeGenre}`, {
         withCredentials: true,
       });
+      console.log(response.data)
       setFictionImages(response.data);
     } catch (error) {
       console.error("Error fetching fiction images:", error);

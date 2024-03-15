@@ -97,9 +97,6 @@
 //   console.log(`Server is running on http://localhost:${port}`);
 // });
 
-
-
-
 const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
@@ -176,8 +173,6 @@ passport.deserializeUser(async (id, done) => {
     done(error);
   }
 });
-
-
 
 mongoose.connect("mongodb://localhost:27017/MyAppDatabase", {
   useNewUrlParser: true,

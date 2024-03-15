@@ -100,7 +100,7 @@ function NonFictionContent() {
                 crossOrigin="anonymous"
               />
             <BooksInfo>
-              <Price>Price: $14.99</Price>
+              <Price>Price: ${image.price.toFixed(2)}</Price>
               <Availability>In-stock</Availability>
             </BooksInfo>
             <Buy>

@@ -77,6 +77,7 @@ function MystreyContent() {
           "http://localhost:5000/images/Mystrey",
           { withCredentials: true }
         );
+        console.log(response.data)
         setFictionImages(response.data);
       } catch (error) {
         console.error("Error fetching fiction images:", error);

@@ -10,11 +10,11 @@ function TabContent({ activeGenre }) {
   return (
     <div>
       {activeGenre === "Fiction" && <FictionContent activeGenre={activeGenre} />}
-      {activeGenre === "Non-Fiction" && <NonFictionContent  activeGenre={activeGenre}  />}
-      {activeGenre === "Mystrey" && <MystreyContent  activeGenre={activeGenre}  />}
-      {activeGenre === "Sci-Fi" && <SciFiContent  activeGenre={activeGenre}  />}
-      {activeGenre === "Self-Help" && <SelfHelpContent  activeGenre={activeGenre}  />}
-      {activeGenre === "Thriller" && <ThrillerContent  activeGenre={activeGenre}  />}
+      {activeGenre === "NonFiction" && <FictionContent  activeGenre={activeGenre}  />}
+      {activeGenre === "Mystrey" && <FictionContent  activeGenre={activeGenre}  />}
+      {activeGenre === "SciFi" && <FictionContent  activeGenre={activeGenre}  />}
+      {activeGenre === "SelfHelp" && <FictionContent  activeGenre={activeGenre}  />}
+      {activeGenre === "Thriller" && <FictionContent  activeGenre={activeGenre}  />}
     </div>
   );
 }

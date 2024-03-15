@@ -32,8 +32,8 @@ function Books() {
         <Tabs
           title={title}
           defaultTitle="Non-Fiction"
-          isActive={activeGenre === "Non-Fiction"}
-          onClick={() => handleOnClick("Non-Fiction")}
+          isActive={activeGenre === "NonFiction"}
+          onClick={() => handleOnClick("NonFiction")}
         />
         <Tabs
           title={title}
@@ -44,14 +44,14 @@ function Books() {
         <Tabs
           title={title}
           defaultTitle="Sci-Fi"
-          isActive={activeGenre === "Sci-Fi"}
-          onClick={() => handleOnClick("Sci-Fi")}
+          isActive={activeGenre === "SciFi"}
+          onClick={() => handleOnClick("SciFi")}
         />
         <Tabs
           title={title}
           defaultTitle="Self-Help"
-          isActive={activeGenre === "Self-Help"}
-          onClick={() => handleOnClick("Self-Help")}
+          isActive={activeGenre === "SelfHelp"}
+          onClick={() => handleOnClick("SelfHelp")}
         />
         <Tabs
           title={title}

@@ -30,7 +30,7 @@ function Geners({ isloggedIn }) {
         <GenerBoxes
           title={"Non-fiction"}
           imageUrl={Image1}
-          onclick={() => handleOnClick("Non-Fiction")}
+          onclick={() => handleOnClick("NonFiction")}
           isActive={activeGenre === "Non-Fiction"}
         />
         <GenerBoxes
@@ -42,13 +42,13 @@ function Geners({ isloggedIn }) {
         <GenerBoxes
           title={"Sci-Fi"}
           imageUrl={Image3}
-          onclick={() => handleOnClick("Sci-Fi")}
+          onclick={() => handleOnClick("SciFi")}
           isActive={activeGenre === "Sci-Fi"}
         />
         <GenerBoxes
           title={"Self-Help"}
           imageUrl={Image4}
-          onclick={() => handleOnClick("Self-Help")}
+          onclick={() => handleOnClick("SelfHelp")}
           isActive={activeGenre === "Self-Help"}
         />
         <GenerBoxes

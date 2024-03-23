@@ -2,12 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { colors } from "../components/Colors";
 
-function GenerBoxes({ title, imageUrl ,onclick,isActive }) {
-    const handleClick = ()=>{
-        onclick()
-    }
+function GenerBoxes({ title, imageUrl, onclick, isActive }) {
+  const handleClick = () => {
+    onclick();
+  };
   return (
-    <Box onClick={handleClick} isActive={isActive} >
+    <Box onClick={handleClick} isActive={isActive}>
       <h1>{title}</h1>
       <img src={imageUrl} alt="box img" />
     </Box>
@@ -15,8 +15,8 @@ function GenerBoxes({ title, imageUrl ,onclick,isActive }) {
 }
 
 const Box = styled.div`
-  height: 50%;
-  width: 70%;
+  height: 60%;
+  width: 90%;
   border-radius: 1rem;
   background-color: ${colors.tertiary};
   overflow-x: hidden;
@@ -25,7 +25,7 @@ const Box = styled.div`
   justify-content: center;
   flex-direction: column;
 
-  & h1{
+  & h1 {
     font-size: 1.2vw;
     font-weight: bolder;
     text-align: center;

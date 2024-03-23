@@ -4,14 +4,15 @@ import { AiOutlineCloseCircle } from "react-icons/ai";
 import { colors } from "../components/Colors";
 
 const DetailsContainer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); // Center the container
+  width: 80%;
+  height: 80%;
   color: ${colors.secondary};
   background-color: black;
-  opacity: 0.8;
+  opacity: 0.9;
   display: flex;
   z-index: 2;
   border-radius: 2rem;
@@ -20,7 +21,7 @@ const DetailsContainer = styled.div`
 
 const ImageContainer = styled.div`
   height: 100%;
-  width: 20%;
+  width: 35%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -73,17 +74,32 @@ const Buy = styled.div`
 
 const DescriptionContainer = styled.div`
   text-align: left;
-  width: 100%;
-  max-height: 100px; /* Adjust the height as needed */
-  overflow-y: auto;
-  overflow-wrap: break-word;
+  & p {
+    width: 100%;
+    max-height: 100px; /* Adjust the height as needed */
+    overflow-y: auto;
+    overflow-wrap: break-word;
+
+    &::-webkit-scrollbar {
+      width: 0.5vw; /* Adjust the width of the scrollbar */
+      background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: ${colors.secondary}; /* Color of the scrollbar thumb */
+      border-radius: 5px; /* Radius of the scrollbar thumb */
+      border: 2px solid ${colors.tertiary}; /* Border around the scrollbar thumb */
+    }
+  }
+  
+  
 `;
 
 const BookDetails = ({ book, onClose }) => {
-  const { _id,title, author, description, imageUrl, price } = book;
-  
+  const { _id, title, author, description, imageUrl, price } = book;
 
-  const formattedPrice = price && typeof price === 'number' ? price.toFixed(2) : 'N/A';
+  const formattedPrice =
+    price && typeof price === "number" ? price.toFixed(2) : "N/A";
 
   const getImageUrl = () => `http://localhost:5000/image/${_id}`;
   return (

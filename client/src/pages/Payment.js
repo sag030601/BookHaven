@@ -1,41 +1,198 @@
-// PaymentComponent.jsx
+// // // PaymentComponent.jsx
+// // import React, { useEffect } from "react";
+// // import { useLocation } from "react-router-dom";
+// // import styled from "styled-components";
+// // import { useBookContext } from "../utils/BookContext";
+
+// // const PaymentComponent = () => {
+// //   const location = useLocation();
+// //   const { setBooks } = useBookContext();
+// //   const { selectedBook = [], totalPrice } = location.state || {};
+// //   console.log(selectedBook);
+
+// //   const Container = styled.div`
+// //     display: grid;
+// //     grid-template-columns: 50% 50%;
+// //     width: 90%;
+// //     margin: 0 auto;
+// //   `;
+
+// //   const Books = styled.div``;
+
+// //   const Content = styled.div`
+// //     display: flex;
+// //     justify-content: space-between;
+
+    
+// //   `;
+
+// //   const Text = styled.div``
+
+// //   // Set selectedBook data to context
+// //   useEffect(() => {
+// //     setBooks(selectedBook);
+// //   }, [selectedBook, setBooks]);
+
+// //   const getImageUrl = (imageId) => `http://localhost:5000/image/${imageId}`;
+
+// //   return (
+// //     <Container>
+// //       <Books>
+// //         {selectedBook.length > 0 && (
+// //           <div>
+// //             <h3>Selected Book Information</h3>
+// //             {selectedBook.map((book, index) => (
+// //               <Content key={index}>
+// //                 <Text>
+// //                   <p>Title: {book.title}</p>
+// //                   <p>Author: {book.author}</p>
+// //                   <p>Price: ${book.price.toFixed(2)}</p>
+// //                 </Text>
+// //                 <img
+// //                   src={getImageUrl(book._id)}
+// //                   alt="Book Cover"
+// //                   style={{
+// //                     width: "200px",
+// //                     height: "200px",
+// //                     borderRadius: "0.5rem",
+// //                   }}
+// //                 />
+// //               </Content>
+// //             ))}
+// //           </div>
+// //         )}
+
+// //       </Books>
+// //       {/* Add payment form or logic here */}
+// //     </Container>
+// //   );
+// // };
+
+// // export default PaymentComponent;
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect } from "react";
+// import { useLocation } from "react-router-dom";
+// import styled from "styled-components";
+// import { useBookContext } from "../utils/BookContext";
+
+// const PaymentComponent = () => {  
+//   const location = useLocation();
+//   const { selectedBooks,setBooks } = useBookContext();
+//   const { selectedBook = [], totalPrice } = location.state || {};
+
+//   useEffect(() => {
+//     setBooks(prevBooks => [...prevBooks, ...selectedBook]);
+//   }, [selectedBook, setBooks]);
+
+//   console.log("Selected Books:", selectedBook);
+
+//   const Container = styled.div`
+//     display: grid;
+//     grid-template-columns: 50% 50%;
+//     width: 90%;
+//     margin: 0 auto;
+//   `;
+
+//   const Books = styled.div``;
+
+//   const Content = styled.div`
+//     display: flex;
+//     justify-content: space-between;
+//   `;
+
+//   const Text = styled.div``;
+
+//   const getImageUrl = (imageId) => `http://localhost:5000/image/${imageId}`;
+
+//   return (
+//     <Container>
+//       <Books>
+//         {selectedBook.length > 0 && (
+//           <div>
+//             <h3>Selected Book Information</h3>
+//             {selectedBook.map((book, index) => (
+//               <Content key={index}>
+//                 <Text>
+//                   <p>Title: {book.title}</p>
+//                   <p>Author: {book.author}</p>
+//                   <p>Price: ${book.price.toFixed(2)}</p>
+//                 </Text>
+//                 <img
+//                   src={getImageUrl(book._id)}
+//                   alt="Book Cover"
+//                   style={{
+//                     width: "200px",
+//                     height: "200px",
+//                     borderRadius: "0.5rem",
+//                   }}
+//                 />
+//               </Content>
+//             ))}
+//           </div>
+//         )}
+//       </Books>
+//       {/* Add payment form or logic here */}
+//     </Container>
+//   );
+// };
+
+// export default PaymentComponent;
+
+
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
 import { useBookContext } from "../utils/BookContext";
+
+const Container = styled.div`
+  display: grid;
+  grid-template-columns: 50% 50%;
+  width: 90%;
+  margin: 0 auto;
+`;
+
+const Books = styled.div``;
+
+const Content = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Text = styled.div``;
 
 const PaymentComponent = () => {
   const location = useLocation();
-  const { setBooks } = useBookContext();
-  const { selectedBook = [], totalPrice } = location.state || {};
-  console.log(selectedBook);
+  const { selectedBooks } = useBookContext();
+  const { selectedBook = [] } = location.state || {};
 
-  const Container = styled.div`
-    display: grid;
-  `;
-
-  // Set selectedBook data to context
   useEffect(() => {
-    setBooks(selectedBook);
-  }, [selectedBook, setBooks]);
-
-  const getImageUrl = (imageId) => `http://localhost:5000/image/${imageId}`;
+    console.log("Selected Books:", selectedBook);
+  }, [selectedBook]);
 
   return (
     <Container>
-      <div>
-        <h2>Payment Page</h2>
-        {selectedBook.length > 0 && (
+      <Books>
+        {selectedBooks.length > 0 && (
           <div>
             <h3>Selected Book Information</h3>
-            {selectedBook.map((book, index) => (
-              <div key={index}>
-                <p>Title: {book.title}</p>
-                <p>Author: {book.author}</p>
-                <p>Price: ${book.price.toFixed(2)}</p>
-                <p>Description: {book.description}</p>
+            {selectedBooks.map((book, index) => (
+              <Content key={index}>
+                <Text>
+                  <p>Title: {book.title}</p>
+                  <p>Author: {book.author}</p>
+                  <p>Price: ${book.price.toFixed(2)}</p>
+                </Text>
                 <img
-                  src={getImageUrl(book._id)}
+                  src={`http://localhost:5000/image/${book._id}`}
                   alt="Book Cover"
                   style={{
                     width: "200px",
@@ -43,14 +200,11 @@ const PaymentComponent = () => {
                     borderRadius: "0.5rem",
                   }}
                 />
-              </div>
+              </Content>
             ))}
           </div>
         )}
-
-        <p>Total Price: ${totalPrice}</p>
-      </div>
-      {/* Add payment form or logic here */}
+      </Books>
     </Container>
   );
 };

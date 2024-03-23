@@ -1,4 +1,4 @@
-import { createContext, useContext,useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 const BookContext = createContext();
 
@@ -7,14 +7,15 @@ export const useBookContext = () => {
 };
 
 export const BookProvider = ({ children }) => {
-  const [selectedBook, setSelectedBook] = useState([]);
+  const [selectedBooks, setSelectedBooks] = useState([]);
 
   const setBooks = (books) => {
-    setSelectedBook(books);
+    setSelectedBooks(books);
+    console.log("Selected books updated:", books);
   };
 
   return (
-    <BookContext.Provider value={{ selectedBook, setBooks }}>
+    <BookContext.Provider value={{ selectedBooks, setBooks }}>
       {children}
     </BookContext.Provider>
   );

@@ -605,6 +605,47 @@ app.get("/images/:genre", async (req, res) => {
 });
 
 
+// Route for fetching items with newArrival set to true
+app.get("/images/newArrival/:genre", async (req, res) => {
+  const { genre } = req.params;
+
+  try {
+    const items = await Item.find({ genre, newArrival: true });
+    res.json(items);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Route for fetching items with topPicks set to true
+app.get("/images/topPicks/:genre", async (req, res) => {
+  const { genre } = req.params;
+
+  try {
+    const items = await Item.find({ genre, topPicks: true });
+    res.json(items);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Route for fetching items with bestSeller set to true
+app.get("/images/bestSeller/:genre", async (req, res) => {
+  const { genre } = req.params;
+
+  try {
+    const items = await Item.find({ genre, bestSeller: true });
+    res.json(items);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

@@ -180,8 +180,6 @@
 
 
 
-
-
 // Register.js
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
@@ -191,15 +189,15 @@ const Register = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const selectedBook = location.state?.selectedBook || [];
-
+  const selectedBook = location.state?.selectedBook || []; // Access selectedBook from location state
+  console.log(selectedBook)
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch("http://localhost:5000/register", {
         method: "POST",
@@ -208,10 +206,10 @@ const Register = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
-        const storedBooks = JSON.parse(localStorage.getItem("selectedBooks")) || [];
-        navigate("/login", { state: { selectedBook: storedBooks } });
+        // Redirect to login page with purchasedBooks data
+        navigate("/login", { state: { purchasedBooks: selectedBook } });
       } else {
         setError("Registration failed. Username may be taken or invalid.");
       }
@@ -220,6 +218,7 @@ const Register = () => {
       setError("An error occurred during registration");
     }
   };
+  
 
   return (
     <div>

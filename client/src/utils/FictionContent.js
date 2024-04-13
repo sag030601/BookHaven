@@ -1021,7 +1021,230 @@
 
 
 
-// FictionContent.js
+// // FictionContent.js
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import styled from "styled-components";
+// import axios from "axios";
+// import BookDetails from "./BookDetails";
+// import { useBookContext } from "../utils/BookContext";
+
+// const Container = styled.div`
+//   width: 90%;
+//   margin: 0 auto;
+//   position: relative;
+
+//   & h1 {
+//     font-size: 2vw;
+//   }
+// `;
+
+// const Books = styled.div`
+//   display: flex;
+//   gap: 5%;
+//   height: 45vh;
+//   width: auto;
+//   flex-wrap: wrap;
+
+//   &::-webkit-scrollbar {
+//     width: 0px;
+//   }
+// `;
+
+// const BookContainer = styled.div`
+//   position: relative;
+//   height: 100%;
+//   width: 14vw;
+// `;
+
+// const BooksContent = styled.div`
+//   display: flex;
+//   gap: 2%;
+//   height: 85%;
+//   box-sizing: border-box;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+//   border-radius: 1rem;
+//   padding: 1rem;
+//   background-color: #e0e0e0;
+
+//   & img {
+//     width: 60%;
+//     height: 65%;
+//     object-fit: cover;
+//     border-radius: 0.5rem;
+//   }
+// `;
+
+// const More = styled.div`
+//   font-size: 0.8vw;
+//   visibility: ${(props) => (props.visible ? "visible" : "hidden")};
+//   position: absolute;
+//   bottom: 0%;
+//   width: 100%;
+//   padding: 0.5rem 0;
+//   background-color: #e0e0e0;
+//   opacity: ${(props) => (props.visible ? 1 : 0)};
+//   transform: translateY(${(props) => (props.visible ? "0%" : "-100%")});
+//   transition: opacity 0.3s, transform 0.3s;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   border-radius: 0.5rem;
+//   cursor: pointer;
+// `;
+
+// const BuyButton = styled.button`
+//   border-radius: 0.5rem;
+//   box-shadow: none;
+//   border: 1px solid;
+//   padding: 0 1vw;
+//   height: 10%;
+//   width: 40%;
+//   background: transparent;
+// `;
+
+// const FictionContent = ({ activeGenre }) => {
+//   const [fictionImages, setFictionImages] = useState([]);
+//   const [hoveredBook, setHoveredBook] = useState(null);
+//   const { selectedBooks, setBooks } = useBookContext();
+//   const [displayedBook, setDisplayedBook] = useState(null);
+//   const [isLoggedIn, setIsLoggedIn] = useState(false); // Define isLoggedIn state
+
+//   const navigate = useNavigate();
+
+//   const checkLoginStatus = async () => {
+//     try {
+//       const response = await axios.get(
+//         "http://localhost:5000/checkLoginStatus",
+//         {
+//           withCredentials: true,
+//         }
+//       );
+//       setIsLoggedIn(response.data.loggedIn);
+//     } catch (error) {
+//       console.error("Error checking login status:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const fetchFictionImages = async () => {
+//       try {
+//         const response = await axios.get(
+//           `http://localhost:5000/images/${activeGenre}`,
+//           { withCredentials: true }
+//         );
+//         setFictionImages(response.data);
+//       } catch (error) {
+//         console.error("Error fetching fiction images:", error);
+//       }
+//     };
+
+//     fetchFictionImages();
+//   }, [activeGenre]);
+
+//   useEffect(() => {
+//     checkLoginStatus();
+//   }, [selectedBooks]);
+
+//   const handleBuyClick = async (book) => {
+//     try {
+//       await checkLoginStatus();
+//       if (isLoggedIn) {
+//         // Send only the current book to payment
+//         navigate("/payment", {
+//           state: {
+//             selectedBook: [book],
+//             totalPrice: book.price.toFixed(2),
+//           },
+//         });
+//       } else {
+//         navigate("/register", { state: { selectedBook: [book] } });
+//       }
+//     } catch (error) {
+//       console.error("Error checking login status:", error);
+//     }
+//   };
+
+//   const handleMoreClick = (book) => {
+//     if (!selectedBooks.some(selectedBook => selectedBook._id === book._id)) {
+//       // Add the book to selectedBooks only if it's not already present
+//       setBooks(prevSelectedBook => [...prevSelectedBook, book]);
+//     }
+//     setDisplayedBook(book);
+//   };
+
+//   const handleMouseEnter = (book) => {
+//     setHoveredBook(book);
+//   };
+
+//   const handleMouseLeave = () => {
+//     setHoveredBook(null);
+//   };
+
+//   const handleCloseDetails = () => {
+//     setDisplayedBook(null);
+//     setBooks([]);
+//   };
+
+//   const BookTitle = styled.div`
+//     font-size: 1vw; /* Adjust as needed */
+//     max-width: 80%;
+//   `;
+
+//   const BookPrice = styled.div`
+//     font-size: 0.8vw; /* Adjust as needed */
+//   `;
+
+//   return (
+//     <Container>
+//       <h1>Best Sellers For Fiction Genre</h1>
+//       <Books>
+//         {fictionImages.map((image, index) => (
+//           <BookContainer
+//             key={image._id}
+//             onMouseEnter={() => handleMouseEnter(image)}
+//             onMouseLeave={handleMouseLeave}
+//           >
+//             <BooksContent>
+//               <img
+//                 src={`http://localhost:5000/image/${image._id}`}
+//                 alt="Book Cover"
+//               />
+//               <BookTitle>{image.title}</BookTitle>
+//               <BookPrice>Price: ${image.price.toFixed(2)}</BookPrice>{" "}
+//               {/* Render price */}
+//               <BuyButton onClick={() => handleBuyClick(image)}>Buy</BuyButton>
+//               <More
+//                 visible={hoveredBook === image}
+//                 onClick={() => handleMoreClick(image)}
+//               >
+//                 More Details
+//               </More>
+//             </BooksContent>
+//           </BookContainer>
+//         ))}
+//       </Books>
+//       {displayedBook && (
+//         <BookDetails book={displayedBook} onClose={handleCloseDetails} />
+//       )}
+//     </Container>
+//   );
+// };
+
+// export default FictionContent;
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -1110,7 +1333,7 @@ const FictionContent = ({ activeGenre }) => {
   const [hoveredBook, setHoveredBook] = useState(null);
   const { selectedBooks, setBooks } = useBookContext();
   const [displayedBook, setDisplayedBook] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Define isLoggedIn state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigate = useNavigate();
 
@@ -1148,30 +1371,41 @@ const FictionContent = ({ activeGenre }) => {
     checkLoginStatus();
   }, [selectedBooks]);
 
+
+
   const handleBuyClick = async (book) => {
     try {
-      await checkLoginStatus();
-      if (isLoggedIn) {
-        // Send only the current book to payment
-        navigate("/payment", {
-          state: {
-            selectedBook: [book],
-            totalPrice: book.price.toFixed(2),
-          },
-        });
+      if (!isLoggedIn) {
+        // If user is not logged in, redirect to the register page
+        navigate("/register");
       } else {
-        navigate("/register", { state: { selectedBook: [book] } });
+        // If user is logged in, send purchasedBooks data along with login request
+        const userData = { purchasedBooks: [book._id] }; // Assuming book._id is sent as purchasedBooks data
+  
+        // Send the userData directly without JSON.stringify
+        await axios.post(
+          "http://localhost:5000/login",
+          userData,
+          {
+            withCredentials: true,
+          }
+        );
+        navigate("/payment", { state: { book } });
       }
     } catch (error) {
-      console.error("Error checking login status:", error);
+      console.error("Error handling buy click:", error);
+      // Optionally handle error
     }
   };
+  
+  
+  
+  
+  
+  
+  
 
   const handleMoreClick = (book) => {
-    if (!selectedBooks.some(selectedBook => selectedBook._id === book._id)) {
-      // Add the book to selectedBooks only if it's not already present
-      setBooks(prevSelectedBook => [...prevSelectedBook, book]);
-    }
     setDisplayedBook(book);
   };
 
@@ -1185,16 +1419,15 @@ const FictionContent = ({ activeGenre }) => {
 
   const handleCloseDetails = () => {
     setDisplayedBook(null);
-    setBooks([]);
   };
 
   const BookTitle = styled.div`
-    font-size: 1vw; /* Adjust as needed */
+    font-size: 1vw;
     max-width: 80%;
   `;
 
   const BookPrice = styled.div`
-    font-size: 0.8vw; /* Adjust as needed */
+    font-size: 0.8vw;
   `;
 
   return (
@@ -1214,7 +1447,6 @@ const FictionContent = ({ activeGenre }) => {
               />
               <BookTitle>{image.title}</BookTitle>
               <BookPrice>Price: ${image.price.toFixed(2)}</BookPrice>{" "}
-              {/* Render price */}
               <BuyButton onClick={() => handleBuyClick(image)}>Buy</BuyButton>
               <More
                 visible={hoveredBook === image}
@@ -1234,16 +1466,6 @@ const FictionContent = ({ activeGenre }) => {
 };
 
 export default FictionContent;
-
-
-
-
-
-
-
-
-
-
 
 
 

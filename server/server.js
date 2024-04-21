@@ -710,7 +710,6 @@
 
 // app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-
 // app.use(
 //   session({
 //     secret: secretKey,
@@ -724,7 +723,6 @@
 
 // app.use(passport.initialize());
 // app.use(passport.session());
-
 
 // passport.use(
 //   new LocalStrategy(async (username, password, done) => {
@@ -747,7 +745,6 @@
 //     }
 //   })
 // );
-
 
 // passport.serializeUser((user, done) => {
 //   done(null, user.id);
@@ -776,8 +773,6 @@
 //   "https://your-react-app-domain.com",
 // ];
 
-
-
 // app.use((req, res, next) => {
 //   console.log("Request received:", req.method, req.url);
 //   next();
@@ -794,9 +789,6 @@
 //     return res.status(401).send("User not authenticated");
 //   }
 // };
-
-
-
 
 // app.post("/login", passport.authenticate("local"), async (req, res) => {
 //   try {
@@ -827,8 +819,6 @@
 //     return res.status(500).send("Internal Server Error");
 //   }
 // });
-
-
 
 // // Assuming routes are defined in your Express app// Route for saving purchased books
 // app.post("/savePurchasedBooks", isAuthenticated, async (req, res) => {
@@ -894,10 +884,6 @@
 //     return res.json({ loggedIn: false });
 //   }
 // });
-
-
-
-
 
 // // Image-related operations
 // const uploadFolderPath = path.join(__dirname, "uploads");
@@ -1049,20 +1035,6 @@
 //   console.log(`Server is running on http://localhost:${PORT}`);
 // });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // server.js
 
 const express = require("express");
@@ -1075,6 +1047,8 @@ const path = require("path");
 const fs = require("fs").promises;
 const sizeOf = require("image-size");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+
 
 const User = require("./model/userModel");
 const Item = require("./model/booksModel");
@@ -1085,7 +1059,7 @@ const PORT = 5000;
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
-app.use(bodyParser.json()); // Set payload size limit
+app.use(bodyParser.json({ limit: "10mb" }));
 
 // Generate a random secret key for session
 const secretKey = crypto.randomBytes(32).toString("hex");
@@ -1110,7 +1084,7 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
       const user = await User.findOne({ username }).exec();
-      console.log(user)
+      console.log(user);
 
       if (!user) {
         return done(null, false, { message: "User not found." });
@@ -1166,7 +1140,7 @@ app.get("/", (req, res) => {
 });
 
 const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (req.session.isLoggedIn) { // Check if user is authenticated based on session
     return next();
   } else {
     return res.status(401).send("User not authenticated");
@@ -1174,25 +1148,52 @@ const isAuthenticated = (req, res, next) => {
 };
 
 
-app.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    console.log(JSON.stringify(user))
-    if (err) {
-      console.error("Error during authentication:", err);
-      return res.status(500).send("Internal Server Error");
-    }
+
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password, purchasedBooks } = req.body;
+    console.log(purchasedBooks)
+    // Find the user by username
+    const user = await User.findOne({ username });
+
+    // If user is not found, return an error
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ error: "Invalid username or password" });
+      console.log("user notfound")
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        console.error("Error during login:", err);
-        return res.status(500).send("Internal Server Error");
-      }
-      return res.status(200).json({ message: "Login successful!" });
-    });
-  })(req, res, next);
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    // If passwords do not match, return an error
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // If authentication is successful, set isLoggedIn flag in session
+    req.session.isLoggedIn = true;
+    req.session.user = user;
+    // Append purchased books to the user's purchasedBooks array
+    if (purchasedBooks) {
+      user.purchasedBooks.push(purchasedBooks); // Assuming purchasedBooks is a single book object
+      await user.save(); // Save the user document
+    }else{
+      console.log("purchased Book error")
+    }
+
+    // Respond with a success message
+    return res.status(200).json({ message: "Login successful!" });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 });
+
+
+
+
+
+
 
 
 
@@ -1218,18 +1219,24 @@ app.post("/savePurchasedBooks", isAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/getPurchasedBooks", async (req, res) => {
+// Route to fetch purchased books added by the user
+app.get("/purchasedBooks", isAuthenticated, async (req, res) => {
   try {
-    // Assuming user's purchased books are stored in user.purchasedBooks
-    const user = await User.findById(req.user.id).populate("purchasedBooks");
+    // Fetch the user's purchased books from the database
+    const user = req.session.user; // Use req.user provided by Passport for authenticated user
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Return the user's purchased books
     res.status(200).json(user.purchasedBooks);
   } catch (error) {
     console.error("Error fetching purchased books:", error);
     res.status(500).send("Internal Server Error");
   }
 });
-
 // Registration route
+
 app.post("/register", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -1240,8 +1247,11 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Username already taken." });
     }
 
-    // Create a new user
-    const newUser = new User({ username, password });
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash password with salt rounds
+
+    // Create a new user with hashed password
+    const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully!" });

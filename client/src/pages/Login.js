@@ -280,7 +280,9 @@ const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const selectedBook = location.state?.selectedBook || [];
+  const purchasedBooks = location.state?.selectedBook || [];
+  console.log(purchasedBooks)
+
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -288,28 +290,20 @@ const Login = ({ setIsLoggedIn }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, purchasedBooks }), // Include purchasedBooks directly
         credentials: "include",
       });
-
+  
       if (response.ok) {
         setIsLoggedIn(true);
-
-        const storedBooks = JSON.parse(localStorage.getItem("selectedBooks")) || [];
-        const updatedSelectedBooks = selectedBook.concat(storedBooks);
-
-        if (updatedSelectedBooks.length > 0) {
-          navigate("/payment", { state: { selectedBook: updatedSelectedBooks } });
-        } else {
-          navigate("/home");
-        }
+        navigate("/payment");
       } else {
         setError("Invalid username or password");
       }
@@ -318,6 +312,10 @@ const Login = ({ setIsLoggedIn }) => {
       setError("An error occurred during login");
     }
   };
+  
+  
+  
+
 
   return (
     <div>

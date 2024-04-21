@@ -651,25 +651,10 @@
 // };
 
 // export default PaymentComponent;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: grid;
@@ -701,24 +686,33 @@ const Message = styled.div`
 `;
 
 const PaymentComponent = () => {
-  const location = useLocation();
-  const { selectedBook = [] } = location.state || [];
-  const [orderPlaced, setOrderPlaced] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState([]);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  const navigate = useNavigate(); // Using useNavigate hook
+
   useEffect(() => {
-    if (selectedBook.length > 0) {
-      setSelectedBooks((prevSelectedBooks) => [
-        ...prevSelectedBooks,
-        ...selectedBook,
-      ]);
-    }
-  }, [selectedBook]);
+    const fetchPurchasedBooks = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/purchasedBooks", {
+          withCredentials: true, // Include credentials with the request
+        });
+        console.log(response)
+        setSelectedBooks(response.data);
+      } catch (error) {
+        console.error("Error fetching purchased books:", error);
+        navigate("/login"); // Redirect to login page if fetching fails
+      }
+    };
+    
+
+    fetchPurchasedBooks();
+  }, [navigate]);
 
   useEffect(() => {
     const calculateTotalPrice = () => {
-      const total = selectedBooks.reduce((acc, book) => acc + book.price, 0);
+      const total = selectedBooks.reduce((acc, book) => acc + (book.price || 0), 0);
       setTotalPrice(total);
     };
 
@@ -728,7 +722,6 @@ const PaymentComponent = () => {
   const handleBuy = async () => {
     try {
       setOrderPlaced(true);
-      setSelectedBooks([]);
     } catch (error) {
       console.error("Error handling buy:", error);
     }
@@ -745,7 +738,7 @@ const PaymentComponent = () => {
                 <Text>
                   <p>Title: {book.title}</p>
                   <p>Author: {book.author}</p>
-                  <p>Price: ${book.price.toFixed(2)}</p>
+                  <p>Price: {book.price ? `$${book.price.toFixed(2)}` : "Price not available"}</p>
                 </Text>
                 <img
                   src={`http://localhost:5000/image/${book._id}`}

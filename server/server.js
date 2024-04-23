@@ -1049,7 +1049,6 @@ const sizeOf = require("image-size");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 
-
 const User = require("./model/userModel");
 const Item = require("./model/booksModel");
 
@@ -1140,7 +1139,8 @@ app.get("/", (req, res) => {
 });
 
 const isAuthenticated = (req, res, next) => {
-  if (req.session.isLoggedIn) { // Check if user is authenticated based on session
+  if (req.session.isLoggedIn) {
+    // Check if user is authenticated based on session
     return next();
   } else {
     return res.status(401).send("User not authenticated");
@@ -1152,14 +1152,13 @@ const isAuthenticated = (req, res, next) => {
 app.post("/login", async (req, res) => {
   try {
     const { username, password, purchasedBooks } = req.body;
-    console.log(purchasedBooks)
+
     // Find the user by username
     const user = await User.findOne({ username });
 
     // If user is not found, return an error
     if (!user) {
       return res.status(401).json({ error: "Invalid username or password" });
-      console.log("user notfound")
     }
 
     // Compare passwords
@@ -1173,68 +1172,48 @@ app.post("/login", async (req, res) => {
     // If authentication is successful, set isLoggedIn flag in session
     req.session.isLoggedIn = true;
     req.session.user = user;
-    // Append purchased books to the user's purchasedBooks array
+
+    // If purchasedBook object is provided, push it into the user's purchasedBooks array
     if (purchasedBooks) {
-      user.purchasedBooks.push(purchasedBooks); // Assuming purchasedBooks is a single book object
-      await user.save(); // Save the user document
-    }else{
-      console.log("purchased Book error")
+      user.purchasedBooks.push(purchasedBooks);
     }
 
-    // Respond with a success message
-    return res.status(200).json({ message: "Login successful!" });
+    // Save the updated user document
+    await user.save();
+
+    // Respond with the entire user object
+    return res.status(200).json({ message: "Login successful!", user });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
-
-
-
-
-
-
-
-app.post("/savePurchasedBooks", isAuthenticated, async (req, res) => {
+app.get("/book/:bookId", async (req, res) => {
   try {
-    const { book } = req.body;
-    const user = await User.findById(req.user._id);
+    const bookId = req.params.bookId;
+    const book = await Item.findById(bookId);
 
-    // Find the user by ID and update their purchased books
-
-    if (!user) {
-      return res.status(404).send("User not found");
+    if (!book) {
+      return res.status(404).json({ error: "Book not found" });
     }
 
-    // Append the purchased books to the user's purchasedBooks array
-    user.purchasedBooks.push(book);
-    await user.save();
-
-    res.status(200).send("Books saved successfully.");
+    res.json(book);
   } catch (error) {
-    console.error("Error saving purchased books:", error);
-    res.status(500).send("Internal Server Error");
+    console.error("Error fetching book:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Route to fetch purchased books added by the user
-app.get("/purchasedBooks", isAuthenticated, async (req, res) => {
-  try {
-    // Fetch the user's purchased books from the database
-    const user = req.session.user; // Use req.user provided by Passport for authenticated user
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
 
-    // Return the user's purchased books
-    res.status(200).json(user.purchasedBooks);
-  } catch (error) {
-    console.error("Error fetching purchased books:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
+
+
+
+
+
+
+
+
 // Registration route
 
 app.post("/register", async (req, res) => {
@@ -1263,12 +1242,16 @@ app.post("/register", async (req, res) => {
 
 // Check login status using express-session
 app.get("/checkLoginStatus", (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.json({ loggedIn: true, user: req.user });
+  if (req.session.isLoggedIn) {
+    // If user is logged in, fetch the user data from the session and return it in the response
+    const userData = req.session.user;
+    return res.status(200).json({ loggedIn: true, user: userData });
   } else {
-    return res.json({ loggedIn: false });
+    return res.status(200).json({ loggedIn: false });
   }
 });
+
+
 
 // Image-related operations
 const uploadFolderPath = path.join(__dirname, "uploads");
@@ -1311,11 +1294,21 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   }
 });
 
+// Route for fetching an item by its ID
 app.get("/image/:itemId", async (req, res) => {
   try {
-    const item = await Item.findById(req.params.itemId).exec();
+    const itemId = req.params.itemId;
+
+    // Check if the provided ID is valid
+    if (!itemId) {
+      return res.status(400).send("Item ID is missing");
+    }
+
+    // Find the item by ID
+    const item = await Item.findById(itemId);
+
     if (!item) {
-      return res.status(404).send("Image not found");
+      return res.status(404).send("Item not found");
     }
 
     const dimensions = sizeOf(Buffer.from(item.img.data, "base64"));
@@ -1325,6 +1318,26 @@ app.get("/image/:itemId", async (req, res) => {
 
     res.type(contentType);
     res.send(Buffer.from(item.img.data, "base64"));
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Route for fetching items by genre
+app.get("/images/:genre", async (req, res) => {
+  const { genre } = req.params;
+
+  try {
+    // Check if the genre is provided
+    if (!genre) {
+      return res.status(400).send("Genre is missing");
+    }
+
+    // Find items by genre
+    const items = await Item.find({ genre });
+
+    res.json(items);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

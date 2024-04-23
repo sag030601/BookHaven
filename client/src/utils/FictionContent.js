@@ -1529,19 +1529,35 @@ const FictionContent = ({ activeGenre }) => {
     updateLoginStatus();
   }, [selectedBooks]); // You might need to replace `selectedBooks` with an appropriate dependency
 
-  const handleBuyClick = (book) => {
+  const handleBuyClick = async (book) => {
     try {
       if (!isLoggedIn) {
         // If user is not logged in, redirect to the register page
         navigate("/register", { state: { selectedBook: book } });
       } else {
-        // If user is logged in, redirect to the payment page
+        // If user is logged in, fetch user data from backend
+        const response = await axios.get("http://localhost:5000/checkLoginStatus", {
+          withCredentials: true,
+        });
+        const userData = response.data.user;
+  
+        // Push the book's ObjectId into the user's purchasedBooks array
+        userData.purchasedBooks.push(book._id);
+  
+        // Update the user's data on the server
+        await axios.put("http://localhost:5000/users/update", userData, {
+          withCredentials: true,
+        });
+  
+        // Navigate the user to the payment page
         navigate("/payment", { state: { selectedBook: book } });
       }
     } catch (error) {
       console.error("Error handling buy click:", error);
     }
   };
+    
+  
 
   const handleMoreClick = (book) => {
     setDisplayedBook(book);

@@ -297,12 +297,9 @@
 // // // //     0
 // // // //   );
 
-
 // // // //   const handleBuy = () => {
 // // // //     setOrderPlaced(true);
 // // // //   };
-
-
 
 // // // //   return (
 // // // //     <Container>
@@ -341,18 +338,6 @@
 // // // // };
 
 // // // // export default PaymentComponent;
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // import React, { useState ,useEffect } from "react";
 // // import styled from "styled-components";
@@ -403,11 +388,9 @@
 // //     setBooks([]);
 // //   };
 
-
 // //   useEffect(() => {
 // //     console.log("Updated books:", books);
 // //   }, [books]);
-  
 
 // //   return (
 // //     <Container>
@@ -448,12 +431,6 @@
 // // };
 
 // // export default PaymentComponent;
-
-
-
-
-
-
 
 // // // PaymentComponent.js
 // // import React, { useState, useEffect } from "react";
@@ -551,12 +528,6 @@
 
 // // export default PaymentComponent;
 
-
-
-
-
-
-
 // import React, { useState, useEffect } from "react";
 // import styled from "styled-components";
 // import { useLocation, useNavigate } from "react-router-dom";
@@ -650,7 +621,8 @@
 //   );
 // };
 
-// export default PaymentComponent;
+// export default PaymentComponent;import React, { useState, useEffect } from "react";
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
@@ -689,30 +661,47 @@ const PaymentComponent = () => {
   const [selectedBooks, setSelectedBooks] = useState([]);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
-
-  const navigate = useNavigate(); // Using useNavigate hook
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPurchasedBooks = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/purchasedBooks", {
-          withCredentials: true, // Include credentials with the request
-        });
-        console.log(response)
-        setSelectedBooks(response.data);
+        const response = await axios.get(
+          "http://localhost:5000/checkLoginStatus",
+          { withCredentials: true }
+        );
+        const userData = response.data;
+
+        if (!userData.loggedIn) {
+          navigate("/login");
+        } else {
+          const bookIds = userData.user.purchasedBooks;
+          const booksData = await Promise.all(
+            bookIds.map(async (id) => {
+              const bookResponse = await axios.get(
+                `http://localhost:5000/book/${id}`
+              );
+              return bookResponse.data;
+            })
+          );
+          setSelectedBooks(booksData);
+        }
       } catch (error) {
-        console.error("Error fetching purchased books:", error);
-        navigate("/login"); // Redirect to login page if fetching fails
+        console.error("Error fetching user data:", error);
+        setError("Error fetching user data. Please try again.");
       }
     };
-    
 
-    fetchPurchasedBooks();
+    fetchUserData();
   }, [navigate]);
 
   useEffect(() => {
     const calculateTotalPrice = () => {
-      const total = selectedBooks.reduce((acc, book) => acc + (book.price || 0), 0);
+      const total = selectedBooks.reduce(
+        (acc, book) => acc + (book.price || 0),
+        0
+      );
       setTotalPrice(total);
     };
 
@@ -730,28 +719,39 @@ const PaymentComponent = () => {
   return (
     <Container>
       <BooksContainer>
-        {selectedBooks.length > 0 && (
-          <div>
-            <h3>Selected Book Information</h3>
-            {selectedBooks.map((book, index) => (
-              <Content key={index}>
-                <Text>
-                  <p>Title: {book.title}</p>
-                  <p>Author: {book.author}</p>
-                  <p>Price: {book.price ? `$${book.price.toFixed(2)}` : "Price not available"}</p>
-                </Text>
-                <img
-                  src={`http://localhost:5000/image/${book._id}`}
-                  alt="Book Cover"
-                  style={{
-                    width: "200px",
-                    height: "200px",
-                    borderRadius: "0.5rem",
-                  }}
-                />
-              </Content>
-            ))}
-          </div>
+        {error ? (
+          <Message>{error}</Message>
+        ) : (
+          <>
+            {selectedBooks.length > 0 && (
+              <div>
+                <h3>Selected Book Information</h3>
+                {selectedBooks.map((book, index) => (
+                  <Content key={index}>
+                    <Text>
+                      <p>Title: {book.title}</p>
+                      <p>Author: {book.author}</p>
+                      <p>
+                        Price:{" "}
+                        {book.price
+                          ? `$${book.price.toFixed(2)}`
+                          : "Price not available"}
+                      </p>
+                    </Text>
+                    <img
+                      src={`http://localhost:5000/image/${book._id}`}
+                      alt="Book Cover"
+                      style={{
+                        width: "200px",
+                        height: "200px",
+                        borderRadius: "0.5rem",
+                      }}
+                    />
+                  </Content>
+                ))}
+              </div>
+            )}
+          </>
         )}
         {orderPlaced && <Message>Order Placed!</Message>}
       </BooksContainer>

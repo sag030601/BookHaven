@@ -1307,7 +1307,7 @@
 //     console.log(isLoggedIn)
 //     try {
 //       if (!isLoggedIn) {
-        
+
 //         // If user is not logged in, redirect to the register page
 //         navigate("/register", { state: { selectedBook: book } });
 //       } else {
@@ -1326,7 +1326,6 @@
 //       // Optionally handle error
 //     }
 //   };
-  
 
 //   const handleMoreClick = (book) => {
 //     setDisplayedBook(book);
@@ -1389,14 +1388,6 @@
 // };
 
 // export default FictionContent;
-
-
-
-
-
-
-
-
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -1491,9 +1482,12 @@ const FictionContent = ({ activeGenre }) => {
 
   const checkLoginStatus = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/checkLoginStatus", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:5000/checkLoginStatus",
+        {
+          withCredentials: true,
+        }
+      );
       setIsLoggedIn(response.data.loggedIn);
     } catch (error) {
       console.error("Error checking login status:", error);
@@ -1535,28 +1529,37 @@ const FictionContent = ({ activeGenre }) => {
         // If user is not logged in, redirect to the register page
         navigate("/register", { state: { selectedBook: book } });
       } else {
-        // If user is logged in, fetch user data from backend
-        const response = await axios.get("http://localhost:5000/checkLoginStatus", {
-          withCredentials: true,
-        });
-        const userData = response.data.user;
+        // Fetch user data
+        const userDataResponse = await axios.get(
+          "http://localhost:5000/checkLoginStatus",
+          {
+            withCredentials: true,
+          }
+        );
+        const userData = userDataResponse.data.user;
   
-        // Push the book's ObjectId into the user's purchasedBooks array
-        userData.purchasedBooks.push(book._id);
+        // Send user ID and book ID to the update route
+        const updateResponse = await axios.post(
+          "http://localhost:5000/update",
+          {
+            userId: userData._id,
+            bookId: book._id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
   
-        // Update the user's data on the server
-        await axios.put("http://localhost:5000/users/update", userData, {
-          withCredentials: true,
-        });
-  
-        // Navigate the user to the payment page
-        navigate("/payment", { state: { selectedBook: book } });
+        // Ensure the update operation completes successfully
+        if (updateResponse.status === 200) {
+          // Navigate the user to the payment page
+          navigate("/payment", { state: { selectedBook: book } });
+        }
       }
     } catch (error) {
       console.error("Error handling buy click:", error);
     }
   };
-    
   
 
   const handleMoreClick = (book) => {

@@ -1209,6 +1209,22 @@ app.get("/book/:bookId", async (req, res) => {
 
 
 
+app.post("/update", async (req, res) => {
+  try {
+    const { userId, bookId } = req.body; // Extract user ID and book ID from request body
+
+    // Find the user by ID and update the purchasedBooks array
+    const user = await User.findByIdAndUpdate(userId, { $push: { purchasedBooks: bookId } }, { new: true });
+
+    // Send the updated user data in the response
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 
 
 
@@ -1241,15 +1257,23 @@ app.post("/register", async (req, res) => {
 });
 
 // Check login status using express-session
-app.get("/checkLoginStatus", (req, res) => {
+app.get("/checkLoginStatus", async (req, res) => {
   if (req.session.isLoggedIn) {
-    // If user is logged in, fetch the user data from the session and return it in the response
-    const userData = req.session.user;
-    return res.status(200).json({ loggedIn: true, user: userData });
+    try {
+      // Fetch the latest user data from the database
+      const user = await User.findById(req.session.user._id);
+      
+      // Send the updated user data in the response
+      return res.status(200).json({ loggedIn: true, user });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
   } else {
     return res.status(200).json({ loggedIn: false });
   }
 });
+
 
 
 

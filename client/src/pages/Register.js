@@ -209,7 +209,7 @@ const Register = () => {
   
       if (response.ok) {
         // Redirect to login page with purchasedBooks data
-        navigate("/login", { state: { purchasedBooks: selectedBook } });
+        navigate("/login", { state: {selectedBook} });
       } else {
         setError("Registration failed. Username may be taken or invalid.");
       }

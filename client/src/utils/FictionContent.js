@@ -1538,6 +1538,7 @@ const FictionContent = ({ activeGenre }) => {
         );
         const userData = userDataResponse.data.user;
   
+        
         // Send user ID and book ID to the update route
         const updateResponse = await axios.post(
           "http://localhost:5000/update",

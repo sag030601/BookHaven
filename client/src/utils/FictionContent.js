@@ -1590,7 +1590,7 @@ const FictionContent = ({ activeGenre }) => {
 
   return (
     <Container>
-      <h1>Best Sellers For Fiction Genre</h1>
+      <h1>Best Sellers For {activeGenre} Genre</h1>
       <Books>
         {fictionImages.map((image, index) => (
           <BookContainer

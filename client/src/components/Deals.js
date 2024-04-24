@@ -15,7 +15,7 @@ import Image10 from "../assets/deals/photo8.webp";
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: 25% 75%;
+  grid-template-columns: 22% 78%;
   width: 90%;
   margin: 0 auto;
   gap: 5%;
@@ -55,11 +55,12 @@ const Books = styled.div`
 `;
 
 const NewArrival = styled.div`
-  height: 30%;
+  height: 25%;
   width: 90%;
   background-color: ${colors.tertiary};
   border-radius: 0.5rem;
   display: flex;
+  justify-content: center;
   flex-direction: column;
   gap: 2%;
   align-items: center;
@@ -78,7 +79,7 @@ const NewArrival = styled.div`
   }
 
   & button {
-    width: 80%;
+    width: 60%;
     margin: 0 auto;
     border-radius: 0.5rem;
     box-shadow: none;
@@ -111,12 +112,13 @@ const Timer = styled.div`
   }
 `;
 const BestSellers = styled.div`
-  height: 30%;
+  height: 25%;
   width: 90%;
   background-color: ${colors.tertiary};
   border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 2%;
   align-items: center;
   padding: 5% 2%;
@@ -135,7 +137,7 @@ const BestSellers = styled.div`
   }
 
   & button {
-    width: 80%;
+    width: 60%;
     margin: 0 auto;
     border-radius: 0.5rem;
     box-shadow: none;
@@ -148,7 +150,7 @@ const BestSellers = styled.div`
 const ImgWrapper = styled.div`
   position: relative;
   width: 60%;
-  height: 50%;
+  height: 40%;
   margin: 8% 0;
   & img {
     width: 100%;
@@ -190,7 +192,7 @@ const BoxContent = styled.div`
   }
 
   & button {
-    padding: 3%;
+    padding: 2%;
     width: 25%;
     background-color: white;
     border-radius: 0.5rem;
@@ -218,7 +220,8 @@ const Content = styled.div`
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 50% 50%;
   gap: 2%;
-  height: 50%;
+  grid-row-gap: 5%;
+  height: 54%;
   width: 92%;
   margin: 10px 0;
 `;
@@ -268,9 +271,8 @@ const TimerDisplay = styled.div`
 `;
 
 const Gener = styled.div`
-  height: 28%;
+  height: 22%;
   width: 90%;
-  margin-top: 10%;
 
   & h1 {
     margin: 20px 0;
@@ -282,6 +284,7 @@ const GenerContent = styled.div`
   grid-template-columns: 50% 50%;
   gap: 2%;
   height: 77%;
+  margin-top: 5%;
 `;
 const Box = styled.div`
   height: 100%;
@@ -372,6 +375,7 @@ function Deals() {
           <FaBook />
           Featured Deals
         </h1>
+
         <BestSellers>
           <h1>Bestsellers</h1>
           <h2>by Top Author</h2>
@@ -381,6 +385,7 @@ function Deals() {
           </ImgWrapper>
           <button>Explore</button>
         </BestSellers>
+
         <NewArrival>
           <h1>New Arrival</h1>
           <h2>Meet the latest</h2>
@@ -390,6 +395,7 @@ function Deals() {
           </ImgWrapper>
           <button>Explore</button>
         </NewArrival>
+
         <Timer>
           <h1>BOOK SALE</h1>
           <h2>Limited time offer</h2>
@@ -447,7 +453,6 @@ function Deals() {
         </Content>
 
         <Gener>
-          <h1>Popular Gener</h1>
           <GenerContent>
             <Box className="best-sellers">
               <BoxContent>

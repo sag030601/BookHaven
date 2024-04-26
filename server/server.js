@@ -1437,28 +1437,57 @@ app.get("/images/bestSeller/:genre", async (req, res) => {
   }
 });
 
-app.delete('/remove-purchased-books', async (req, res) => {
+app.delete("/remove-purchased-books", async (req, res) => {
   try {
     const userId = req.body.userId;
     const bookId = req.body.bookId;
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Remove the book from purchasedBooks array
     user.purchasedBooks.pull(bookId);
     await user.save();
 
-    res.json({ message: 'Book removed successfully' });
+    res.json({ message: "Book removed successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 
+app.post("/search", async (req, res) => {
+  const searchTerm = req.body.searchTerm;
+  console.log("Received search term:", searchTerm); // Log the received search term
 
+  try {
+    const books = await Item.find({
+      title: { $regex: searchTerm, $options: "i" },
+    }).exec();
+    
+    // Convert image buffer data to base64 string
+    const booksWithBase64Images = books.map(book => {
+      const base64Image = Buffer.from(book.img.data).toString('base64');
+      return {
+        ...book.toObject(),
+        img: {
+          data: base64Image,
+          contentType: book.img.contentType
+        }
+      };
+    });
+
+    console.log("Search query:", {
+      title: { $regex: searchTerm, $options: "i" },
+    });
+    res.json(booksWithBase64Images);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.listen(PORT, () => {
   mongoose

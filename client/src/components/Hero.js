@@ -1,23 +1,86 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import heroRight from "../assets/hero/right.png";
 import Color, { colors } from "./Colors";
 
 function Hero() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const searchContainerRef = useRef(null);
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/search", {
+        // Send request to /search endpoint
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ searchTerm }), // Include searchTerm in request body
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      console.log(response)
+
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Perform search when searchTerm changes
+    handleSearch();
+  }, [searchTerm]);
+
+  // Close search results when clicked outside the search container
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setSearchResults([]); // Hide search results
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <Conatiner>
+    <Container>
       <Left>
         <LeftContent>
           <h1>Explore a world of literary treasures for every reader</h1>
           <h2>Browse by genre, author, or featured picks!</h2>
-          <Search>
+          <Search ref={searchContainerRef}>
             <Input>
-              <input />
-              <Styledsearch />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by title, author, or genre"
+              />
+              <StyledSearch />
             </Input>
-            <button>Search</button>
+            <button onClick={handleSearch}>Search</button>
           </Search>
+          <SearchContent>
+            {searchResults.map((result) => (
+              <BookItem key={result._id}>
+                <BookImage src={`http://localhost:5000/image/${result._id}`} alt={result.title} />
+                <div>
+                  <h3>{result.title}</h3>
+                  <p>by {result.author}</p>
+                </div>
+              </BookItem>
+            ))}
+          </SearchContent>
         </LeftContent>
       </Left>
       <Right>
@@ -25,15 +88,14 @@ function Hero() {
           <img src={heroRight} alt="Hero Right" />
         </RightImg>
       </Right>
-    </Conatiner>
+    </Container>
   );
 }
 
-const Conatiner = styled.div`
+const Container = styled.div`
   height: 70vh;
   display: grid;
   grid-template-columns: 60% 40%;
-  /* border: 1px solid black; */
 `;
 
 const Search = styled.div`
@@ -115,12 +177,43 @@ const Input = styled.div`
   }
 `;
 
-const Styledsearch = styled(FaSearch)`
+const StyledSearch = styled(FaSearch)`
   position: absolute;
   height: 100%;
   right: 5%;
   top: 0;
   font-weight: bolder;
+`;
+
+const SearchContent = styled.div`
+  margin-top: 20px;
+  width: 100%;
+  height: 15em;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+`;
+
+const BookItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  p {
+    margin: 0;
+    color: ${colors.secondary};
+  }
+`;
+
+const BookImage = styled.img`
+  width: 100px; /* Adjust the width as needed */
+  height: auto;
+  margin-right: 20px;
 `;
 
 export default Hero;

@@ -623,18 +623,12 @@
 
 // export default PaymentComponent;import React, { useState, useEffect } from "react";
 
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { MdClose } from "react-icons/md"; // Import close icon from react-icons
 import { colors } from "../components/Colors";
-
 
 const Container = styled.div`
   display: grid;
@@ -644,31 +638,38 @@ const Container = styled.div`
 `;
 
 const BooksContainer = styled.div`
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 `;
 
 const BookWrapper = styled.div`
-    margin-bottom: 20px; /* Adjust the value as per your preference */
-    &:last-child {
-        margin-bottom: 0; /* Remove margin for the last book */
-    }
+  margin-bottom: 20px;
 `;
 
 const Content = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border: 1px solid ${colors.secondary};
   border-radius: 1em;
-  padding: 2%;
+  padding: 5%;
   background-color: ${colors.tertiary};
 
-
   & img {
-    object-fit: contain;
     width: 20%;
-    height: 90%;
+    height: 100%;
+    object-fit: cover;
   }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
 `;
 
 const Button = styled.button`
@@ -737,6 +738,23 @@ const PaymentComponent = () => {
     calculateTotalPrice();
   }, [selectedBooks]);
 
+  const handleClose = async (book) => {
+    const response = await axios.get("http://localhost:5000/checkLoginStatus", {
+      withCredentials: true,
+    });
+    const userData = response.data;
+    const userId = userData.user._id;
+    const bookId = book._id;
+    console.log(bookId, userId);
+
+    const fetch = await axios.delete(
+      "http://localhost:5000/remove-purchased-books",
+      {
+        data: { userId, bookId }, // Pass userId and bookId in the request body
+      }
+    );
+  };
+
   const handleBuy = async () => {
     try {
       setOrderPlaced(true);
@@ -771,12 +789,10 @@ const PaymentComponent = () => {
                       <img
                         src={`http://localhost:5000/image/${book._id}`}
                         alt="Book Cover"
-                        style={{
-                          width: "200px",
-                          height: "200px",
-                          borderRadius: "0.5rem",
-                        }}
                       />
+                      <CloseButton onClick={() => handleClose(book)}>
+                        <MdClose />
+                      </CloseButton>
                     </Content>
                   </BookWrapper>
                 ))}

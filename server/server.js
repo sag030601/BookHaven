@@ -1119,7 +1119,6 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-
 const allowedOrigins = [
   "http://localhost:3000",
   "https://your-react-app-domain.com",
@@ -1142,8 +1141,6 @@ const isAuthenticated = (req, res, next) => {
     return res.status(401).send("User not authenticated");
   }
 };
-
-
 
 app.post("/login", async (req, res) => {
   try {
@@ -1201,16 +1198,16 @@ app.get("/book/:bookId", async (req, res) => {
   }
 });
 
-
-
-
-
 app.post("/update", async (req, res) => {
   try {
     const { userId, bookId } = req.body; // Extract user ID and book ID from request body
 
     // Find the user by ID and update the purchasedBooks array
-    const user = await User.findByIdAndUpdate(userId, { $push: { purchasedBooks: bookId } }, { new: true });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $push: { purchasedBooks: bookId } },
+      { new: true }
+    );
 
     // Send the updated user data in the response
     res.status(200).json({ user });
@@ -1219,12 +1216,6 @@ app.post("/update", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-
-
-
-
 
 // Registration route
 
@@ -1258,7 +1249,7 @@ app.get("/checkLoginStatus", async (req, res) => {
     try {
       // Fetch the latest user data from the database
       const user = await User.findById(req.session.user._id);
-      
+
       // Send the updated user data in the response
       return res.status(200).json({ loggedIn: true, user });
     } catch (error) {
@@ -1269,9 +1260,6 @@ app.get("/checkLoginStatus", async (req, res) => {
     return res.status(200).json({ loggedIn: false });
   }
 });
-
-
-
 
 // Image-related operations
 const uploadFolderPath = path.join(__dirname, "uploads");
@@ -1449,9 +1437,34 @@ app.get("/images/bestSeller/:genre", async (req, res) => {
   }
 });
 
+app.delete('/remove-purchased-books', async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const bookId = req.body.bookId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Remove the book from purchasedBooks array
+    user.purchasedBooks.pull(bookId);
+    await user.save();
+
+    res.json({ message: 'Book removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
 app.listen(PORT, () => {
-  mongoose.connect("mongodb://localhost:27017/MyAppDatabase", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(console.log("server open and connected to db"))
+  mongoose
+    .connect("mongodb://localhost:27017/MyAppDatabase", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(console.log("server open and connected to db"));
 });

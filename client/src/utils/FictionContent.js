@@ -1472,7 +1472,7 @@ const BuyButton = styled.button`
   background: transparent;
 `;
 
-const FictionContent = ({ activeGenre }) => {
+const FictionContent = ({ activeGenre, selectedSortOptions }) => {
   const [fictionImages, setFictionImages] = useState([]);
   const [hoveredBook, setHoveredBook] = useState(null);
   const { selectedBooks } = useBookContext();
@@ -1497,6 +1497,36 @@ const FictionContent = ({ activeGenre }) => {
   useEffect(() => {
     checkLoginStatus();
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let response;
+        if (selectedSortOptions === "bestSeller") {
+          response = await axios.get(
+            `http://localhost:5000/images/bestSeller/${activeGenre}`
+          );
+        } else if (selectedSortOptions === "newArrival") {
+          response = await axios.get(
+            `http://localhost:5000/images/newArrival/${activeGenre}`
+          );
+        } else if (selectedSortOptions === "topPicks") {
+          response = await axios.get(
+            `http://localhost:5000/images/topPicks/${activeGenre}`
+          );
+        }
+        // Check if response is successful before updating state
+        if (response && response.status === 200) {
+          setFictionImages(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [selectedSortOptions, activeGenre]);
+  
 
   useEffect(() => {
     const fetchFictionImages = async () => {
@@ -1537,8 +1567,7 @@ const FictionContent = ({ activeGenre }) => {
           }
         );
         const userData = userDataResponse.data.user;
-  
-        
+
         // Send user ID and book ID to the update route
         const updateResponse = await axios.post(
           "http://localhost:5000/update",
@@ -1550,7 +1579,7 @@ const FictionContent = ({ activeGenre }) => {
             withCredentials: true,
           }
         );
-  
+
         // Ensure the update operation completes successfully
         if (updateResponse.status === 200) {
           // Navigate the user to the payment page
@@ -1561,7 +1590,6 @@ const FictionContent = ({ activeGenre }) => {
       console.error("Error handling buy click:", error);
     }
   };
-  
 
   const handleMoreClick = (book) => {
     setDisplayedBook(book);

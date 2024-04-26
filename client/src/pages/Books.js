@@ -24,15 +24,8 @@ function Books() {
     }
   }, [activeGenre]);
 
-  const handleSortOptionChange = (option) => {
-    // Toggle the option in selectedSortOptions
-    if (selectedSortOptions.includes(option)) {
-      setSelectedSortOptions(
-        selectedSortOptions.filter((item) => item !== option)
-      );
-    } else {
-      setSelectedSortOptions([...selectedSortOptions, option]);
-    }
+  const handleOnSort = (option) => {
+    setSelectedSortOptions(option);
   };
 
   return (
@@ -44,26 +37,27 @@ function Books() {
           <SortList>
             <ListItems>
               <label
-                onClick={() => handleOnClick("bestSeller")}
-                onChange={() => handleSortOptionChange("BestSeller")}
+                onClick={() => handleOnSort("bestSeller")}
                 htmlFor="BestSeller"
               >
                 BestSeller
               </label>
-           
             </ListItems>
             <ListItems>
-              <label 
-                onClick={() => handleOnClick("topPicks")}
-                onChange={() => handleSortOptionChange("topPicks")}
-              htmlFor="TopPicks">Top-picks</label>
-             
+              <label
+                onClick={() => handleOnSort("topPicks")}
+                htmlFor="TopPicks"
+              >
+                Top-picks
+              </label>
             </ListItems>
             <ListItems>
-              <label htmlFor="NewArrival"
-                onClick={() => handleOnClick("newArrival")}
-                onChange={() => handleSortOptionChange("newArrival")}
-              >New Arrival</label>
+              <label
+                htmlFor="NewArrival"
+                onClick={() => handleOnSort("newArrival")}
+              >
+                New Arrival
+              </label>
             </ListItems>
           </SortList>
         </Sort>

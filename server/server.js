@@ -1119,10 +1119,6 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-mongoose.connect("mongodb://localhost:27017/MyAppDatabase", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -1454,5 +1450,8 @@ app.get("/images/bestSeller/:genre", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  mongoose.connect("mongodb://localhost:27017/MyAppDatabase", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(console.log("server open and connected to db"))
 });

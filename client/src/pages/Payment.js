@@ -623,10 +623,18 @@
 
 // export default PaymentComponent;import React, { useState, useEffect } from "react";
 
+
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { colors } from "../components/Colors";
+
 
 const Container = styled.div`
   display: grid;
@@ -635,11 +643,32 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const BooksContainer = styled.div``;
+const BooksContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const BookWrapper = styled.div`
+    margin-bottom: 20px; /* Adjust the value as per your preference */
+    &:last-child {
+        margin-bottom: 0; /* Remove margin for the last book */
+    }
+`;
 
 const Content = styled.div`
   display: flex;
   justify-content: space-between;
+  border: 1px solid ${colors.secondary};
+  border-radius: 1em;
+  padding: 2%;
+  background-color: ${colors.tertiary};
+
+
+  & img {
+    object-fit: contain;
+    width: 20%;
+    height: 90%;
+  }
 `;
 
 const Button = styled.button`
@@ -727,27 +756,29 @@ const PaymentComponent = () => {
               <div>
                 <h3>Selected Book Information</h3>
                 {selectedBooks.map((book, index) => (
-                  <Content key={index}>
-                    <Text>
-                      <p>Title: {book.title}</p>
-                      <p>Author: {book.author}</p>
-                      <p>
-                        Price:{" "}
-                        {book.price
-                          ? `$${book.price.toFixed(2)}`
-                          : "Price not available"}
-                      </p>
-                    </Text>
-                    <img
-                      src={`http://localhost:5000/image/${book._id}`}
-                      alt="Book Cover"
-                      style={{
-                        width: "200px",
-                        height: "200px",
-                        borderRadius: "0.5rem",
-                      }}
-                    />
-                  </Content>
+                  <BookWrapper key={index}>
+                    <Content>
+                      <Text>
+                        <p>Title: {book.title}</p>
+                        <p>Author: {book.author}</p>
+                        <p>
+                          Price:{" "}
+                          {book.price
+                            ? `$${book.price.toFixed(2)}`
+                            : "Price not available"}
+                        </p>
+                      </Text>
+                      <img
+                        src={`http://localhost:5000/image/${book._id}`}
+                        alt="Book Cover"
+                        style={{
+                          width: "200px",
+                          height: "200px",
+                          borderRadius: "0.5rem",
+                        }}
+                      />
+                    </Content>
+                  </BookWrapper>
                 ))}
               </div>
             )}

@@ -7,27 +7,29 @@ import Color, { colors } from "./Colors";
 function Hero() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [showSearchContent, setShowSearchContent] = useState(false);
   const searchContainerRef = useRef(null);
+  const searchContentRef = useRef(null);
 
   const handleSearch = async () => {
     try {
       const response = await fetch("http://localhost:5000/search", {
-        // Send request to /search endpoint
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ searchTerm }), // Include searchTerm in request body
+        body: JSON.stringify({ searchTerm }),
       });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
-      console.log(response)
-
       const data = await response.json();
       setSearchResults(data);
+
+      // Show search content only if there are search results and searchTerm is not empty
+      setShowSearchContent(data.length > 0 && searchTerm.trim() !== "");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -41,8 +43,14 @@ function Hero() {
   // Close search results when clicked outside the search container
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target) &&
+        searchContentRef.current &&
+        !searchContentRef.current.contains(event.target)
+      ) {
         setSearchResults([]); // Hide search results
+        setShowSearchContent(false); // Hide search content
       }
     };
 
@@ -70,7 +78,7 @@ function Hero() {
             </Input>
             <button onClick={handleSearch}>Search</button>
           </Search>
-          <SearchContent>
+          <SearchContent ref={searchContentRef} visible={showSearchContent}>
             {searchResults.map((result) => (
               <BookItem key={result._id}>
                 <BookImage src={`http://localhost:5000/image/${result._id}`} alt={result.title} />
@@ -188,10 +196,24 @@ const StyledSearch = styled(FaSearch)`
 const SearchContent = styled.div`
   margin-top: 20px;
   width: 100%;
-  height: 15em;
-  overflow-y: scroll;
-  display: flex;
+  height: ${(props) => (props.visible ? "15em" : "0")};
+  overflow-y: auto;
+  display: ${(props) => (props.visible ? "flex" : "none")};
   flex-direction: column;
+
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: ${colors.secondary} transparent;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${colors.secondary};
+    border-radius: 4px;
+    width: 2px;
+  }
 `;
 
 const BookItem = styled.div`
@@ -211,7 +233,7 @@ const BookItem = styled.div`
 `;
 
 const BookImage = styled.img`
-  width: 100px; /* Adjust the width as needed */
+  width: 100px;
   height: auto;
   margin-right: 20px;
 `;

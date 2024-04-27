@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { colors } from "./Colors";
 import { FaBook } from "react-icons/fa";
 import Image1 from "../assets/deals/Image7.png";
@@ -286,6 +287,17 @@ const GenerContent = styled.div`
   height: 77%;
   margin-top: 5%;
 `;
+
+const Button = styled.button`
+  width: 60%;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  box-shadow: none;
+  border: 1px solid black;
+  padding: 3%;
+  font-weight: 900;
+`;
+
 const Box = styled.div`
   height: 100%;
   width: 100%;
@@ -368,6 +380,17 @@ const CountdownTimer = ({ hours = 0, minutes = 0, seconds = 0 }) => {
 };
 
 function Deals() {
+  const navigate = useNavigate();
+
+  const handleExploreClick = (genre) => {
+    // Navigate to '/books' route with state
+    navigate("/books", {
+      state: {
+        activeGenre: "Fiction",
+      },
+    });
+  };
+
   return (
     <Container>
       <Offers>
@@ -383,7 +406,9 @@ function Deals() {
             <img src={Image1} alt="Best Sellers" />
             <h1>30% Off</h1>
           </ImgWrapper>
-          <button>Explore</button>
+          <Button onClick={() => handleExploreClick("bestSellers")}>
+            Explore
+          </Button>
         </BestSellers>
 
         <NewArrival>
@@ -393,7 +418,9 @@ function Deals() {
             <img src={Image2} alt="New Arrival" />
             <h1>30% Off</h1>
           </ImgWrapper>
-          <button>Explore</button>
+          <Button onClick={() => handleExploreClick("bestSellers")}>
+            Explore
+          </Button>
         </NewArrival>
 
         <Timer>
@@ -408,42 +435,42 @@ function Deals() {
           <FaBook /> Top Picks
         </h1>
         <Content>
-          <ImageWraper>
+          <ImageWraper onClick={()=>handleExploreClick("bestseller")} >
             <ImageContent src={Image3} alt="" srcset="" />
             <Txt>
               <h1>Best collection of novels</h1>
               <h2>$8.99</h2>
             </Txt>
           </ImageWraper>
-          <ImageWraper>
+          <ImageWraper onClick={()=>handleExploreClick("bestseller")} >
             <ImageContent src={Image4} alt="" srcset="" />
             <Txt>
               <h1>Best mystrey novels</h1>
               <h2>$11.11</h2>
             </Txt>
           </ImageWraper>
-          <ImageWraper>
+          <ImageWraper onClick={()=>handleExploreClick("bestseller")}>
             <ImageContent src={Image5} alt="" srcset="" />
             <Txt>
               <h1>Best Self-care Books</h1>
               <h2>$14.99</h2>
             </Txt>
           </ImageWraper>
-          <ImageWraper>
+          <ImageWraper onClick={()=>handleExploreClick("bestseller")}>
             <ImageContent src={Image6} alt="" srcset="" />
             <Txt>
               <h1>Best Thrillers</h1>
               <h2>$12.99</h2>
             </Txt>
           </ImageWraper>
-          <ImageWraper>
+          <ImageWraper onClick={()=>handleExploreClick("bestseller")}>
             <ImageContent src={Image7} alt="" srcset="" />
             <Txt>
               <h1>Best Sellers</h1>
               <h2>$10.99</h2>
             </Txt>
           </ImageWraper>
-          <ImageWraper>
+          <ImageWraper onClick={()=>handleExploreClick("bestseller")}>
             <ImageContent src={Image8} alt="" srcset="" />
             <Txt>
               <h1>Best Newly Arrived</h1>
@@ -458,14 +485,18 @@ function Deals() {
               <BoxContent>
                 <h1>Best Sellers</h1>
                 <h2>Trending Now,Bookmarks</h2>
-                <button>Explore</button>
+                <Button onClick={() => handleExploreClick("bestSellers")}>
+                  Explore
+                </Button>
               </BoxContent>
             </Box>
             <Box className="top-picks">
               <BoxContent>
                 <h1>Top Picks</h1>
                 <h2>Top Rated,Best for you</h2>
-                <button>Explore</button>
+                <Button onClick={() => handleExploreClick("bestSellers")}>
+                  Explore
+                </Button>
               </BoxContent>
             </Box>
           </GenerContent>

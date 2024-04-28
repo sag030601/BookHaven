@@ -30,7 +30,6 @@ function Books() {
 
   return (
     <Main>
-      <Topsection></Topsection>
       <Columns>
         <Sort>
           <SortHeader>Sort by</SortHeader>
